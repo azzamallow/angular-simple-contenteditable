@@ -28,6 +28,32 @@ describe 'Directive: contenteditable', ->
         visibleText = element.text().replace /[^ -~]/g, ''
         expect(visibleText).toEqual 'I have entered text'
 
+    describe 'when blur is applied to the element', ->
+      beforeEach ->
+        element.html '&#8203;' + 'this is new text'
+        element.triggerHandler 'blur'
+
+      it 'should update the view value, removing invisble chars', ->
+        expect(scope.myModelToBindTo).toEqual 'this is new text'
+
+      it 'should render the view value', ->
+        expect(element.text()).not.toEqual 'this is new text'
+        text = element.text().replace /[^ -~]/g, ''
+        expect(text).toEqual 'this is new text'
+
+    describe 'when the contenteditable is multiline enabled', ->
+      beforeEach inject ($compile) ->
+        element.attr 'multiline', 'true'
+        scope.myModelToBindTo = '\\n\\nI have entered text\\n\\n'
+        element = $compile(element) scope
+
+      describe 'when blur is applied to the element', ->
+        beforeEach ->
+          element.triggerHandler 'blur'
+
+        it 'should remove leading and trailing line breaks', ->
+          expect(scope.myModelToBindTo).toEqual 'I have entered text'
+
   describe 'when there is placeholder text', ->
     beforeEach inject ($compile) ->
       element.attr 'placeholder', 'Placeholder text'
