@@ -10,6 +10,47 @@ describe 'Directive: contenteditable', ->
     scope = $rootScope.$new()
     element = angular.element '<div ng-model="myModelToBindTo" contenteditable="true"></div>'
 
+  describe 'keyup event', ->
+    it 'should replace all <br> with line breaks', inject ($compile) ->
+      element = $compile(element) scope
+      element.html 'I have entered text<br>s'
+      element.triggerHandler 'keyup'
+      text = scope.myModelToBindTo.replace /[^ -~]/g, '' # Replace all hidden chars
+      expect(text).toEqual 'I have entered text\\ns'
+
+    it 'should remove non printable chars', inject ($compile) ->
+      element = $compile(element) scope
+      element.html '&#8203;' + 'I have entered text'
+      element.triggerHandler 'keyup'
+      expect(scope.myModelToBindTo).toEqual 'I have entered text'
+      
+    describe 'when enter is pressed', ->
+      beforeEach ->
+        $('body').append element
+        element.trigger 'focus'
+        expect(document.activeElement).toEqual element.get(0)
+
+      afterEach ->
+        element.detach()
+
+      describe 'for multiline', ->
+        beforeEach inject ($compile) ->
+          element.attr 'multiline', 'true'
+          element = $compile(element) scope
+          element.trigger $.Event('keyup', which: 13)
+
+        it 'should not trigger a blur event', ->
+          expect(document.activeElement).toEqual element.get(0)
+
+      describe 'for single line', ->
+        beforeEach inject ($compile) ->
+          element.attr 'multiline', undefined
+          element = $compile(element) scope
+          element.trigger $.Event('keyup', which: 13)
+
+        it 'should trigger a blur event', ->
+          expect(document.activeElement).not.toEqual element.get(0)
+
   describe 'when there is a model value', ->
     beforeEach inject ($compile) ->
       element = $compile(element) scope
