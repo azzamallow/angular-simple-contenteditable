@@ -12,3 +12,9 @@ Browser support
 ---------------
 
 angular-contenteditable currently supports Google Chrome. Other browsers may work but not been verified yet.
+
+Coming up
+---------
+
+* Bower support
+* Usage instructions
