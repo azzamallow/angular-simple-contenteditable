@@ -1,6 +1,6 @@
 {
-  "name": "angular-contenteditable",
-  "version": "0.0.0",
+  "name": "angular-simple-contenteditable",
+  "version": "0.0.1",
   "dependencies": {
     "angular": "1.2.4",
     "json3": "~3.2.4",
