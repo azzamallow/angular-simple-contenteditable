@@ -63,8 +63,14 @@ angular.module('contenteditable')
         # Replace non printable chars
         value = value.replace /[^ -~]/g, ''
 
+        # Remove all other elements that may have crept in
+        value = value.replace /<[^>]*>/g, '' 
+
         # Bind from view to the model
         scope.$apply -> ctrl.$setViewValue value
+
+        # Re-render the value back, unnecessary markup may need to be cleaned up
+        ctrl.$render()
 
         # Lose focus when enter is pressed on single line
         if !attrs.multiline? && event.which == 13

@@ -85,11 +85,24 @@ describe 'Directive: contenteditable', ->
       element.triggerHandler 'keyup'
       expect(scope.myModelToBindTo).toEqual 'I have entered text\\ns'
 
+    it 'should remove all other element tags', inject ($compile) ->
+      element = $compile(element) scope
+      element.html 'I have entered text<br>s with <a>other</a> <div>stuff</div>'
+      element.triggerHandler 'keyup'
+      expect(scope.myModelToBindTo).toEqual 'I have entered text\\ns with other stuff'
+
     it 'should remove non printable chars', inject ($compile) ->
       element = $compile(element) scope
       element.html '&#8203;' + 'I have entered text'
       element.triggerHandler 'keyup'
       expect(scope.myModelToBindTo).toEqual 'I have entered text'
+
+    it 'should re-render the value back on to the page to ensure markup is clean', inject ($compile) ->
+      element = $compile(element) scope
+      element.html 'I have entered text<br>s with <a>other</a> <div>stuff</div>'
+      element.triggerHandler 'keyup'
+      visibleHtml = element.html().replace /[^ -~]/g, ''
+      expect(visibleHtml).toEqual 'I have entered text<br>s with other stuff'
 
     describe 'when enter is pressed', ->
       beforeEach ->
