@@ -35,9 +35,11 @@
           var value;
           value = element.html().replace(/<br>/g, '\\n');
           value = value.replace(/[^ -~]/g, '');
+          value = value.replace(/<[^>]*>/g, '');
           scope.$apply(function() {
             return ctrl.$setViewValue(value);
           });
+          ctrl.$render();
           if ((attrs.multiline == null) && event.which === 13) {
             return element.trigger('blur');
           }
