@@ -1,5 +1,7 @@
 (function() {
   'use strict';
+  angular.module('contenteditable', []);
+
   angular.module('contenteditable').directive('contenteditable', function($window, $document) {
     return {
       require: 'ngModel',
