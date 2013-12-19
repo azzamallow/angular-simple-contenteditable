@@ -10,20 +10,87 @@ describe 'Directive: contenteditable', ->
     scope = $rootScope.$new()
     element = angular.element '<div ng-model="myModelToBindTo" contenteditable="true"></div>'
 
-  describe 'keyup event', ->
+  describe 'when keydown is applied to the element', ->
+    describe 'and enter is pressed', ->
+      event = null
+
+      beforeEach inject ($compile) ->
+        element = $compile(element) scope
+        event = $.Event 'keydown', which: 13
+        $('body').append element
+        element.trigger event
+
+      afterEach ->
+        element.remove()
+
+      it 'should prevent the default action', ->
+        expect(event.isDefaultPrevented()).toBeTruthy()
+
+    describe 'and enter is not pressed', ->
+      event = null
+
+      beforeEach inject ($compile) ->
+        element = $compile(element) scope
+        event = $.Event 'keydown', which: 14
+        $('body').append element
+        element.trigger event
+
+      afterEach ->
+        element.remove()
+
+      it 'should not prevent the default action', ->
+        expect(event.isDefaultPrevented()).toBeFalsy()
+
+    describe 'for single line', ->
+      beforeEach ->
+        element.attr 'multiline', undefined
+        element.html 'hello<br>text'
+
+      describe 'and enter is pressed', ->
+        beforeEach inject ($compile) ->
+          element = $compile(element) scope
+          $('body').append element
+          element.trigger $.Event('keydown', which: 13)
+
+        afterEach ->
+          element.remove()
+
+        it 'should not insert a break', ->
+          expect(element.html()).toEqual 'hello<br>text'
+
+    describe 'for multiline', ->
+      beforeEach ->
+        element.attr 'multiline', 'true'
+        element.html 'hello<br>text'
+
+      describe 'and enter is pressed', ->
+        selection = null
+
+        beforeEach inject ($compile, $window, $document) ->
+          element = $compile(element) scope
+          $('body').append element
+          element.trigger 'focus' # cursor at start of element 
+          element.trigger $.Event('keydown', which: 13)
+
+        afterEach ->
+          element.remove()
+
+        it 'should insert a break', ->
+          expect(element.html()).toEqual '<br>hello<br>text'
+
+  describe 'when keyup is applied to the element', ->
     it 'should replace all <br> with line breaks', inject ($compile) ->
       element = $compile(element) scope
       element.html 'I have entered text<br>s'
       element.triggerHandler 'keyup'
-      text = scope.myModelToBindTo.replace /[^ -~]/g, '' # Replace all hidden chars
-      expect(text).toEqual 'I have entered text\\ns'
+      expect(scope.myModelToBindTo).toEqual 'I have entered text\\ns'
 
     it 'should remove non printable chars', inject ($compile) ->
       element = $compile(element) scope
       element.html '&#8203;' + 'I have entered text'
       element.triggerHandler 'keyup'
       expect(scope.myModelToBindTo).toEqual 'I have entered text'
-      
+
     describe 'when enter is pressed', ->
       beforeEach ->
         $('body').append element
@@ -31,7 +98,7 @@ describe 'Directive: contenteditable', ->
         expect(document.activeElement).toEqual element.get(0)
 
       afterEach ->
-        element.detach()
+        element.remove()
 
       describe 'for multiline', ->
         beforeEach inject ($compile) ->
