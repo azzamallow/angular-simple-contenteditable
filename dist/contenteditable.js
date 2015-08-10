@@ -2,7 +2,7 @@
   'use strict';
   angular.module('contenteditable', []);
 
-  angular.module('contenteditable').directive('contenteditable', function($window, $document) {
+  angular.module('contenteditable').directive('contenteditable', ['$window', '$document', function($window, $document) {
     return {
       require: 'ngModel',
       link: function(scope, element, attrs, ctrl) {
@@ -78,6 +78,6 @@
         });
       }
     };
-  });
+  }]);
 
 }).call(this);
