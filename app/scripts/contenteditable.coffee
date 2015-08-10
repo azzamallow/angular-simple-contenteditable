@@ -3,7 +3,7 @@
 angular.module 'contenteditable', []
 
 angular.module('contenteditable')
-  .directive 'contenteditable', ($window, $document) ->
+  .directive 'contenteditable', ['$window', '$document', ($window, $document) ->
 
     # Inherit behaviour from ngModel
     require: 'ngModel',
@@ -115,3 +115,4 @@ angular.module('contenteditable')
 
         # render the value
         ctrl.$render()
+  ]
